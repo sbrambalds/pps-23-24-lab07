@@ -1,7 +1,8 @@
-package u06lab.code
+package ex1
 
-import org.junit.Test
+import ex1.*
 import org.junit.Assert.*
+import org.junit.Test
 
 class ParserTests:
   def parser = new BasicParser(Set('a', 'b', 'c'))

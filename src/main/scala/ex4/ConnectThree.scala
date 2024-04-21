@@ -1,4 +1,4 @@
-package u06lab.code
+package ex4
 
 import java.util.OptionalInt
 
@@ -70,7 +70,7 @@ object ConnectThree extends App:
   // .... .... .... ....
   // ...X .... .... ....
   // ...O ..XO .X.O X..O
-  println("EX 3: ")
+  println("EX 4: ")
 // Exercise 3 (ADVANCED!): implement computeAnyGame such that..
   computeAnyGame(O, 4).foreach { g =>
     printBoards(g)

@@ -1,4 +1,4 @@
-package u06lab.code
+package ex3
 
 object Solitaire extends App:
   def render(solution: Seq[(Int, Int)], width: Int, height: Int): String =
