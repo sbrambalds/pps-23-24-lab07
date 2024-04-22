@@ -29,12 +29,12 @@ class SimpleRobot(var position: Position, var direction: Direction) extends Robo
     case Direction.South => (position._1, position._2 - 1)
     case Direction.West => (position._1 - 1, position._2)
 
-  override def toString(): String = s"robot at $position facing $direction"
+  override def toString: String = s"robot at $position facing $direction"
 
 class DumbRobot(val robot: Robot) extends Robot:
   export robot.{position, direction, act}
   override def turn(dir: Direction): Unit = {}
-  override def toString(): String = s"${robot.toString} (Dump)"
+  override def toString: String = s"${robot.toString} (Dump)"
 
 class LoggingRobot(val robot: Robot) extends Robot:
   export robot.{position, direction, turn}
@@ -42,7 +42,7 @@ class LoggingRobot(val robot: Robot) extends Robot:
     robot.act()
     println(robot.toString)
 
-@main def testRobot: Unit =
+@main def testRobot(): Unit =
   val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
   robot.act() // robot at (0, 1) facing North
   robot.turn(robot.direction.turnRight) // robot at (0, 1) facing East
