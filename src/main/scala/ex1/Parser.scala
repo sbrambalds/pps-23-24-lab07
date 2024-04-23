@@ -5,38 +5,56 @@ package ex1
   * class NotTwoConsecutiveParser, used in the testing code at the end. Note we also test that the two mixins can work
   * together!!
   */
+object Parsers:
+  extension(seq: String)
+    def charParser(): Parser[Char] = new BasicParser(seq.toSet)
 
 abstract class Parser[T]:
   def parse(t: T): Boolean // is the token accepted?
   def end: Boolean // is it ok to end here
   def parseAll(seq: Seq[T]): Boolean = (seq forall parse) & end // note &, not &&
 
-object Parsers:
-  extension(seq: String)
-    def charParser(): Parser[Char] = new BasicParser(seq.toSet)
+trait NonEmpty[T] extends Parser[T]:
+  private[this] var empty = true
+
+  abstract override def parse(t: T): Boolean =
+    empty = false;
+    super.parse(t) // who is super??
+
+  abstract override def end: Boolean = !empty && super.end
+
+trait NotTwoConsecutive[T] extends Parser[T]:
+  private[this] var prev: Option[T] = Option.empty
+
+  abstract override def parse(t: T): Boolean = if prev.isDefined then
+    if prev.get == t then false else updatePrev(t)
+  else updatePrev(t)
+
+  private def updatePrev(t: T): Boolean =
+    prev = Option(t)
+    super.parse(t)
+
+trait ShortenThenN[T] extends Parser[T]:
+  def n: Int
+  private[this] var count = 0
+
+  abstract override def parse(t: T): Boolean =
+    count = count + 1
+    if (count <= n) then super.parse(t) else reset() //XYZZY
+
+  private def reset(): Boolean =
+    count = 0;
+    false
 
 class BasicParser(chars: Set[Char]) extends Parser[Char]:
   override def parse(t: Char): Boolean = chars.contains(t)
   override def end: Boolean = true
 
-trait NonEmpty[T] extends Parser[T]:
-  private[this] var empty = true
-  abstract override def parse(t: T): Boolean =
-    empty = false;
-    super.parse(t) // who is super??
-  abstract override def end: Boolean = !empty && super.end
-
 class NonEmptyParser(chars: Set[Char]) extends BasicParser(chars) with NonEmpty[Char]
 
-trait NotTwoConsecutive[T] extends Parser[T]:
-  private[this] var prev: Option[T] = Option.empty
-  abstract override def parse(t: T): Boolean = if prev.isDefined then
-    if prev.get == t then false else updatePrev(t)
-  else updatePrev(t)
-  private def updatePrev(t: T): Boolean =
-    prev = Option(t)
-    super.parse(t)
 class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) with NotTwoConsecutive[Char]
+
+class ShortenThenNParser(chars: Set[Char], override val n: Int) extends BasicParser(chars) with ShortenThenN[Char]
 
 @main def checkParsers(): Unit =
   import Parsers.*
@@ -69,3 +87,8 @@ class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) with 
   println(sparser.parseAll("aabc".toList)) // true
   println(sparser.parseAll("aabcdc".toList)) // false
   println(sparser.parseAll("".toList)) // true
+
+  def parserSTN = new ShortenThenNParser(Set('X', 'Y', 'Z'), 5)
+  println(parserSTN.parseAll("XYZYY".toList)) // true
+  println(parserSTN.parseAll("XYYZXZYY".toList)) // false
+  println(parserSTN.parseAll("".toList)) // true
