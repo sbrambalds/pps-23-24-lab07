@@ -42,8 +42,24 @@ class LoggingRobot(val robot: Robot) extends Robot:
     robot.act()
     println(robot.toString)
 
+class RobotWithbattery(val robot: Robot, private val amount: Int) extends Robot:
+  export robot.{position, direction}
+  private var _battery: Int = 100
+  def battery: Int = _battery
+
+  override def turn(dir: Direction): Unit = if (battery > 0) then robot.turn(dir)
+
+  override def act(): Unit =
+    if (battery > 0) then
+      robot.act()
+      _battery -= amount
+
+class RobotCanFail(val robot: Robot, private val prob: Double) extends Robot:
+  export robot.{position, direction, turn}
+  override def act(): Unit = if ((Math.random() * 100).round <= prob) then robot.act()
+
 @main def testRobot(): Unit =
-  val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
+  val robot = RobotCanFail(SimpleRobot((0, 0), Direction.North), 20)
   robot.act() // robot at (0, 1) facing North
   robot.turn(robot.direction.turnRight) // robot at (0, 1) facing East
   robot.act() // robot at (1, 1) facing East
