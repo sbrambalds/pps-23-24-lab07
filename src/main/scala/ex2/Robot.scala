@@ -58,6 +58,10 @@ class RobotCanFail(val robot: Robot, private val prob: Double) extends Robot:
   export robot.{position, direction, turn}
   override def act(): Unit = if ((Math.random() * 100).round <= prob) then robot.act()
 
+class RobotRepeated(val robot : Robot, private val times: Int) extends Robot:
+  export robot.{position, direction, turn}
+  override def act(): Unit = for i <- 0 until times do robot.act()
+
 @main def testRobot(): Unit =
   val robot = RobotCanFail(SimpleRobot((0, 0), Direction.North), 20)
   robot.act() // robot at (0, 1) facing North
