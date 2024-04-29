@@ -49,8 +49,8 @@ class RobotWithbattery(val robot: Robot, private val amount: Int) extends Robot:
   private var _battery: Int = 100
   def battery: Int = _battery
   def discharge: Boolean =
-    _battery -= amount
-    _battery > 0
+    if (_battery - amount) > 0 then _battery -= amount
+    battery > 0
   override def turn(dir: Direction): Unit = if discharge then robot.turn(dir)
   override def act(): Unit = if discharge then robot.act()
 
