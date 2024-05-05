@@ -17,18 +17,18 @@ object Solitaire:
 
   given IterableFactory = LazyList(_)
 
-  def placeMarks(movesLeft: Int = width*height)(using factory: IterableFactory): Iterable[Solution] = movesLeft match
+  def placeMarks(movesLeft: Int = width*height - 1)(using factory: IterableFactory): Iterable[Solution] = movesLeft match
     case 0 => factory(List(startPos))
     case _ =>
       for
         sol <- placeMarks(movesLeft - 1)
-        x <- 0 to width
-        y <- 0 to height
+        x <- 0 until width
+        y <- 0 until height
         cell = (x, y)
         if valid(sol, cell)
       yield sol.++(List(cell))
 
-  def valid(solution: Iterable[Cell], dest: Cell): Boolean =  !solution.exists(p => p == dest) & correct(solution.head, dest)
+  def valid(solution: Iterable[Cell], dest: Cell): Boolean =  !solution.exists(p => p == dest) & correct(solution.last, dest)
 
   def correct(source: Cell, dest: Cell): Boolean =
     val x = (source._1 - dest._1).abs
@@ -44,4 +44,4 @@ object Solitaire:
     rows.mkString("\n")
 
   @main def run (): Unit =
-    placeMarks().zipWithIndex.foreach({solution => println("Solution " + solution._2 + "\n" + render(solution._1.toList))})
+    placeMarks().zipWithIndex.foreach({solution => println("Solution " + solution._2 + "\n" + render(solution._1.toList) + "\n")})
