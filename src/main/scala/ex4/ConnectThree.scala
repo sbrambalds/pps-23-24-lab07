@@ -27,11 +27,24 @@ object ConnectThree extends App:
 
   import Player.*
 
-  def find(board: Board, x: Int, y: Int): Option[Player] = ???
+  def find(board: Board, x: Int, y: Int): Option[Player] =
+    val ps = for
+      disk <- board
+      if (disk.x eq x) & (disk.y eq y)
+    yield disk.player
+    ps.headOption
 
-  def firstAvailableRow(board: Board, x: Int): Option[Int] = ???
+  def firstAvailableRow(board: Board, x: Int): Option[Int] = if board.count(disk => disk.x eq x) < 4 then
+    None
+  else
+    Some(board.count(disk => disk.x eq x))
 
-  def placeAnyDisk(board: Board, player: Player): Seq[Board] = ???
+  def placeAnyDisk(board: Board, player: Player): Seq[Board] =
+    for
+      x <- 0 to 3
+      y <- firstAvailableRow(board,x)
+    yield board.concat(Seq(Disk(x,y, player)))
+
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
 
@@ -59,13 +72,14 @@ object ConnectThree extends App:
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X)), 0)) // Some(2)
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X)), 0)) // Some(3)
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X), Disk(0, 3, X)), 0)) // None
-  // Exercise 2: implement placeAnyDisk such that..
+  // Exercise 3: implement placeAnyDisk such that..
+  println("EX 3: ")
   printBoards(placeAnyDisk(List(), X))
   // .... .... .... ....
   // .... .... .... ....
   // .... .... .... ....
   // ...X ..X. .X.. X...
-  printBoards(placeAnyDisk(List(Disk(0, 0, O)), X))
+  printBoards(placeAnyDisk(List(Disk(3, 0, O)), X))
   // .... .... .... ....
   // .... .... .... ....
   // ...X .... .... ....
